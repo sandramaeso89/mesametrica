@@ -60,7 +60,10 @@ export function TopBar({ eventName, status, mode, canUndo, canRedo, onUndo, onRe
           <kbd>⌘K</kbd>
         </button>
         <button type="button" className="icon-btn" onClick={onToggleTheme} aria-label="Cambiar entre tema claro y oscuro" title="Tema">
-          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 4.8 4.8 0 0 1 0-13Z" fill="currentColor" /></svg>
+          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+            <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M8 2a6 6 0 0 1 0 12Z" fill="currentColor" />
+          </svg>
         </button>
       </div>
     </header>
