@@ -17,11 +17,16 @@ create table if not exists public.seating_plans (
 -- Límites de integridad: el payload debe tener la forma esperada y no superar
 -- 64 KB (suficiente para varios cientos de invitados).
 alter table public.seating_plans drop constraint if exists seating_plans_payload_shape;
+-- coalesce: si falta una clave, jsonb_typeof devuelve NULL y un CHECK con NULL
+-- se daría por bueno.
 alter table public.seating_plans add constraint seating_plans_payload_shape check (
-  jsonb_typeof(payload) = 'object'
-  and jsonb_typeof(payload -> 'guests') = 'array'
-  and jsonb_typeof(payload -> 'tables') = 'array'
-  and jsonb_typeof(payload -> 'relations') = 'array'
+  coalesce(
+    jsonb_typeof(payload) = 'object'
+    and jsonb_typeof(payload -> 'guests') = 'array'
+    and jsonb_typeof(payload -> 'tables') = 'array'
+    and jsonb_typeof(payload -> 'relations') = 'array',
+    false
+  )
 );
 alter table public.seating_plans drop constraint if exists seating_plans_payload_size;
 alter table public.seating_plans add constraint seating_plans_payload_size check (

@@ -69,4 +69,4 @@ Develop los corrigió: objetivo lexicográfico (conflictos antes que afinidades)
 
 ### Cierre
 
-Testing aprobó 32 pruebas, lint, tipos, build, `npm audit` y la revisión en navegador a 375, 1024 y 1440 px en tema claro y oscuro, sin errores de consola. El Orquestador aplicó la migración de políticas en Supabase, comprobó los permisos del rol anónimo y desplegó.
+Testing aprobó 32 pruebas, lint, tipos, build, `npm audit` y la revisión en navegador a 375, 1024 y 1440 px en tema claro y oscuro, sin errores de consola. El Orquestador desplegó la versión nueva y aplicó después la migración de políticas, para que la web publicada no perdiera el guardado en ningún momento. Al atacar la API publicada con la clave anónima, Testing encontró **F11**: la restricción de forma aceptaba un payload sin claves porque un `CHECK` que da `NULL` no falla. Develop lo corrigió con `coalesce` y restauró la fila de la demo. Las siete pruebas de la API pasan.

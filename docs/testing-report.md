@@ -20,7 +20,7 @@ Las comprobaciones automáticas pasaron, pero la revisión estática detectó do
 
 ## Ronda 3 — auditoría previa a la entrega
 
-Testing revisó el código, la base de datos publicada en Supabase y la web desplegada. Encontró diez fallos (F8, F9 y F10 aparecieron al repetir las pruebas tras las primeras correcciones). Dos de ellos (F2 y F3) contradecían requisitos marcados como superados en la Ronda 2.
+Testing revisó el código, la base de datos publicada en Supabase y la web desplegada. Encontró once fallos. F8, F9 y F10 aparecieron al repetir las pruebas tras las primeras correcciones, y F11 al verificar la base de datos ya desplegada. Dos de ellos (F2 y F3) contradecían requisitos marcados como superados en la Ronda 2.
 
 | Id | Gravedad | Archivo | Pasos | Esperado | Obtenido |
 | --- | --- | --- | --- | --- | --- |
@@ -33,6 +33,7 @@ Testing revisó el código, la base de datos publicada en Supabase y la web desp
 | F7 | Media | `SeatingWorkspace.tsx` | Arrastrar un invitado en una pantalla táctil. | Se puede mover. | HTML Drag and Drop no funciona con el dedo. |
 | F8 | Baja | `GuestPanel.tsx`, `CommandPalette.tsx` | Buscar «lucia» con una invitada «Lucía». | La encuentra. | Sin resultados. Detectado al repetir la prueba tras el rediseño. |
 | F9 | Alta | `src/lib/seating.ts` | Repetir la prueba de F6 tras añadir la fase de mejora local. | 0 conflictos. | La mejora local volvía a juntar a a y b porque su objetivo sumaba afinidades y conflictos en la misma escala. Detectado por la prueba nueva de F6 antes de integrar. |
+| F11 | Alta | `supabase/schema.sql` | Tras desplegar, `PATCH` como visitante anónimo con `{"payload": {"hola": 1}}`. | Rechazo por la restricción de forma. | Aceptado: si falta una clave, `jsonb_typeof` devuelve `NULL` y un `CHECK` con `NULL` se da por bueno. La interfaz no se rompió (`parsePlan` lo descartó y cargó la demo local), pero la fila quedó sustituida. |
 | F10 | Media | `src/lib/seating.ts` | Generar la demo y contar afinidades. Comparar con una distribución hecha a mano. | La mejor distribución posible: 7 de 8 afinidades, 0 conflictos. | 5 de 8. La mejora local se quedaba en un óptimo local porque llegar al óptimo exige dos intercambios seguidos. |
 
 ### Correcciones de Develop y nueva verificación
@@ -48,6 +49,7 @@ Testing revisó el código, la base de datos publicada en Supabase y la web desp
 | F7 | Arrastre con eventos de puntero (ratón, lápiz y dedo) y botones «Mover a» como alternativa. | Navegador: arrastre, intercambio y arrastre a «Sin mesa». | PASS |
 | F8 | Búsqueda sin tildes ni mayúsculas. | Navegador: «lucia» encuentra «Lucía». | PASS |
 | F9 | Objetivo lexicográfico: primero minimizar conflictos, después maximizar afinidades. | Misma prueba de F6. | PASS |
+| F11 | `CHECK` envuelto en `coalesce(…, false)` y fila de demo restaurada. | Pruebas contra la API publicada: payload sin claves o que no es objeto → `23514`. | PASS |
 | F10 | Búsqueda local iterada: evaluación incremental y perturbaciones con semilla fija; el esfuerzo se acota por tamaño, no por tiempo, para seguir siendo determinista. | «encuentra el óptimo de la demo», «resuelve 300 invitados sin conflictos» (≈0,3 s). | PASS |
 
 ## Resultado final
@@ -62,7 +64,8 @@ Testing revisó el código, la base de datos publicada en Supabase y la web desp
 | Dependencias | PASS | `npm audit --omit=dev`: 0 vulnerabilidades |
 | Determinismo | PASS | dos ejecuciones con la misma entrada producen las mismas mesas |
 | Distribución de la demo | PASS | 12/12 sentados, 0 conflictos, 7 de 8 afinidades (la octava es incompatible con un conflicto), 96/100 |
-| RLS y permisos | PASS | `pg_policies` y `role_table_grants` revisados en el proyecto publicado |
+| RLS y permisos | PASS | Pruebas contra la API publicada con la clave anónima: leer la demo ✔; insertar → `42501`; borrar → `42501`; actualizar otra fila → 0 filas; payload de más de 64 KB → `23514`; payload sin forma → `23514`; actualizar la demo ✔. Avisos de seguridad de Supabase: ninguno |
+| Producción | PASS | https://mesametrica.vercel.app responde `200` sin login, carga desde Supabase y guarda («supabase · guardado»), sin errores de consola en escritorio ni en móvil |
 | Arrastre e intercambio | PASS | ratón y eventos de puntero simulados; vista previa de puntos antes de soltar |
 | Deshacer / rehacer | PASS | `⌘Z` y `⇧⌘Z`, prueba de reducer |
 | Responsive | PASS | 375 px, 1024 px y 1440 px sin desplazamiento horizontal |
