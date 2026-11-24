@@ -1,5 +1,5 @@
-import { SeatingWorkspace } from "@/components/SeatingWorkspace";
+import { Workspace } from "@/components/workspace/Workspace";
 
 export default function Home() {
-  return <SeatingWorkspace />;
+  return <Workspace />;
 }

@@ -5,11 +5,14 @@ export type Guest = {
   needs?: string;
 };
 
+export type RelationKind = "affinity" | "conflict";
+export type RelationWeight = 1 | 2 | 3;
+
 export type GuestRelation = {
   guestA: string;
   guestB: string;
-  kind: "affinity" | "conflict";
-  weight: 1 | 2 | 3;
+  kind: RelationKind;
+  weight: RelationWeight;
 };
 
 export type Table = {
@@ -27,11 +30,28 @@ export type SeatingPlan = {
   updatedAt: string;
 };
 
+/** Una decisión del algoritmo, en el orden en que se tomó. */
+export type SolverStep = {
+  guestId: string;
+  tableId: string | null;
+  /** Valor de la colocación: afinidades suman, conflictos restan. */
+  value: number;
+  reason: "affinity" | "avoid-conflict" | "balance" | "forced-conflict" | "no-capacity";
+  /** Invitados ya sentados con los que tiene afinidad en la mesa elegida. */
+  partners: string[];
+};
+
 export type PlanAnalysis = {
   score: number;
-  maxScore: number;
-  conflicts: number;
-  affinities: number;
+  seated: number;
   unseated: string[];
-  explanations: Record<string, string[]>;
+  conflicts: number;
+  conflictsTotal: number;
+  affinities: number;
+  affinitiesTotal: number;
+  freeSeats: number;
+  /** Plazas que faltan para sentar a todo el mundo (0 si hay sitio). */
+  missingSeats: number;
+  /** Invitados que comparten mesa con alguien con quien tienen conflicto. */
+  guestsInConflict: string[];
 };
