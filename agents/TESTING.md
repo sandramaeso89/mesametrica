@@ -5,10 +5,18 @@ Testing revisa el trabajo de Develop de forma independiente. Un requisito solo s
 ## Flujo de revisión
 
 1. Instalar las dependencias con el gestor indicado por el lockfile.
-2. Ejecutar comprobación de tipos, pruebas, lint y build, cuando existan esos scripts.
-3. Revisar el flujo principal en navegador, en una anchura móvil de 390 px y en escritorio.
-4. Registrar comandos, resultados y fallos en `docs/testing-report.md`.
-5. Devolver a Develop cualquier fallo. Repetir la revisión después de la corrección.
+2. Ejecutar comprobación de tipos, pruebas, lint, build y `npm audit`.
+3. Revisar el flujo principal en navegador a 390 px, 1024 px y 1440 px, en tema claro y oscuro.
+4. Revisar la base de datos publicada: políticas RLS, permisos del rol anónimo y restricciones.
+5. Registrar cada fallo con **id, gravedad, archivo, pasos, resultado esperado y resultado obtenido** en `docs/testing-report.md`.
+6. Devolver a Develop cualquier fallo. Repetir la revisión después de la corrección y anotar la evidencia.
+
+## Gravedad
+
+- **Crítica:** pérdida o corrupción de datos, o cualquier visitante puede romper la demo.
+- **Alta:** un requisito no se cumple o la interfaz muestra información falsa.
+- **Media:** un flujo funciona pero confunde, pierde datos del usuario o falla en un tamaño de pantalla.
+- **Baja:** mejora sin impacto funcional.
 
 ## Requisitos funcionales
 
@@ -24,6 +32,14 @@ Testing revisa el trabajo de Develop de forma independiente. Un requisito solo s
 - La distribución muestra puntuación y explicaciones comprensibles.
 - Una edición manual no puede duplicar invitados ni exceder una mesa sin un aviso claro.
 - La persistencia con Supabase es opcional. Sin variables de entorno, la demo sigue funcionando y lo comunica sin mostrar errores técnicos.
+- Un invitado sin mesa siempre es visible y se puede colocar a mano.
+- Se puede deshacer cualquier cambio.
+
+## Seguridad de datos
+
+- El rol anónimo no puede crear filas, borrar filas ni leer o modificar filas que no sean la de la demo.
+- Un payload corrupto o malicioso en la base de datos no rompe la interfaz.
+- El payload tiene un tamaño máximo.
 
 ## Algoritmo
 
@@ -51,7 +67,7 @@ Las pruebas unitarias deben cubrir, como mínimo:
 - Los botones de icono tienen nombre accesible.
 - Los estados importantes no dependen solo del color.
 - El contraste del texto es legible.
-- A 390 px no hay desplazamiento horizontal, campos cortados ni acciones inaccesibles.
+- A 390 px y a 1024 px no hay desplazamiento horizontal, campos cortados ni acciones inaccesibles.
 - En escritorio se aprovecha el espacio sin líneas de texto excesivamente largas.
 - Arrastrar y soltar tiene una alternativa operable con teclado o mediante controles.
 
